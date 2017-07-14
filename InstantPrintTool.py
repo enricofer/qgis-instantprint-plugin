@@ -10,6 +10,7 @@
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4.QtXml import *
 from qgis.core import *
 from qgis.gui import *
 import os
@@ -249,6 +250,38 @@ class InstantPrintTool(QgsMapTool):
             prev = self.dialogui.comboBox_composers.currentText()
         self.dialogui.comboBox_composers.clear()
         active = 0
+        if not self.iface.activeComposers():
+            msgBox = QMessageBox()
+            msgBox.setText(self.tr("The current project has not active composers."))
+            msgBox.setInformativeText(self.tr("Do you want to load default composers?"))
+            msgBox.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+            resp = msgBox.exec_()
+            if resp == QMessageBox.Yes:
+                template_dir = os.path.join(os.path.dirname(__file__),'templates')
+                for file in os.listdir(template_dir):
+                    filename, extension = os.path.splitext(file)
+                    print filename, extension
+                    if extension == '.qpt':
+                        # Load template
+                        newComposition = QgsComposition(self.iface.mapCanvas().mapSettings())
+                        template_filename = os.path.join(template_dir,file)
+                        template_file = open(template_filename, 'r')
+                        template_content = template_file.read()
+                        template_file.close()
+                        templateDocument = QDomDocument()
+                        templateDocument.setContent(template_content)
+                        #newComposition.loadFromTemplate(templateDocument)
+                        # add label
+                        mapItem = QgsComposerMap(newComposition)
+                        mapItem.setItemPosition(10.0,10.0,277.0,190.0)
+                        newComposition.addComposerMap(mapItem)
+                        
+                        newComposer = self.iface.createNewComposer(filename)
+                        newComposer.setComposition(newComposition)
+
+            else:
+                self.dialog.close()
+                return
         for composer in self.iface.activeComposers():
             if composer != removed and composer.composerWindow():
                 cur = composer.composerWindow().windowTitle()
