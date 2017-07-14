@@ -37,11 +37,22 @@ class InstantPrintTool(QgsMapTool):
         self.dialogui.comboBox_fileformat.addItem("JPG", self.tr("JPG Image (*.jpg);;"))
         self.dialogui.comboBox_fileformat.addItem("BMP", self.tr("BMP Image (*.bmp);;"))
         self.dialogui.comboBox_fileformat.addItem("PNG", self.tr("PNG Image (*.png);;"))
+        self.dialogui.comboBox_defaults.addItem(self.tr("A4 portrait"),"A4v" )
+        self.dialogui.comboBox_defaults.addItem(self.tr("A4 landscape"),"A4h" )
+        self.dialogui.comboBox_defaults.addItem(self.tr("A3 portrait"),"A3v")
+        self.dialogui.comboBox_defaults.addItem(self.tr("A3 landscape;;"),"A3h")
+        self.defaultFormats = {
+            "A4v":(210.0,297.0),
+            "A4h":(297.0,210.0),
+            "A3v":(297.0,420.0),
+            "A3h":(420.0,297.0)
+         }
         self.dialogui.spinBoxScale.valueChanged.connect(self.__changeScale)
 
         self.iface.composerAdded.connect(lambda view: self.__reloadComposers())
         self.iface.composerWillBeRemoved.connect(self.__reloadComposers)
         self.dialogui.comboBox_composers.currentIndexChanged.connect(self.__selectComposer)
+        self.dialogui.comboBox_defaults.currentIndexChanged.connect(self.__selectDefault)
         self.exportButton.clicked.connect(self.__export)
         self.helpButton.clicked.connect(self.__help)
         self.dialogui.buttonBox.button(QDialogButtonBox.Close).clicked.connect(lambda: self.setEnabled(False))
@@ -73,10 +84,23 @@ class InstantPrintTool(QgsMapTool):
         self.mapitem.setNewExtent(QgsRectangle(x1, y1, x2, y2))
         self.__createRubberBand()
 
+    def __selectDefault(self):
+        pass
+
     def __selectComposer(self):
         if not self.dialog.isVisible():
             return
         activeIndex = self.dialogui.comboBox_composers.currentIndex()
+        '''
+        if activeIndex > 0:
+            self.dialogui.comboBox_defaults.hide()
+            self.dialogui.label_defaults.hide()
+        else:
+            self.setEnabled(None)
+            self.setEnabled(True)
+            self.dialogui.comboBox_defaults.show()
+            self.dialogui.label_defaults.show()
+        '''
         if activeIndex < 0:
             return
 
@@ -230,6 +254,22 @@ class InstantPrintTool(QgsMapTool):
             prev = self.dialogui.comboBox_composers.currentText()
         self.dialogui.comboBox_composers.clear()
         active = 0
+        
+        # Load default template
+        format = self.dialogui.comboBox_defaults.itemData(self.dialogui.comboBox_defaults.currentIndex())
+        x, y = 0, 0
+        w, h = self.defaultFormats[format]
+        print w,h
+        composition = QgsComposition(self.iface.mapCanvas().mapSettings())
+        composition.setPlotStyle(QgsComposition.Print)
+        composition.setPaperSize(w, h)
+        composerMap = QgsComposerMap(composition, x ,y, w, h)
+        composerMap.setNewScale(composerMap.scale()/2)
+        composition.addItem(composerMap)
+        composerView = QgsComposerView()
+        composerView.setComposition(composition)
+        self.dialogui.comboBox_composers.addItem('DEFAULT', composerView)
+        
         for composer in self.iface.activeComposers():
             if composer != removed and composer.composerWindow():
                 cur = composer.composerWindow().windowTitle()

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'printdialog.ui'
+# Form implementation generated from reading ui file 'Z:\dev\instantprint\ui\printdialog.ui'
 #
-# Created: Thu Feb 26 15:01:51 2015
+# Created: Thu Mar 03 14:53:10 2016
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_InstantPrintDialog(object):
     def setupUi(self, InstantPrintDialog):
         InstantPrintDialog.setObjectName(_fromUtf8("InstantPrintDialog"))
-        InstantPrintDialog.resize(263, 162)
+        InstantPrintDialog.resize(263, 186)
         icon = QtGui.QIcon.fromTheme(_fromUtf8("printer"))
         InstantPrintDialog.setWindowIcon(icon)
         self.gridLayout = QtGui.QGridLayout(InstantPrintDialog)
@@ -59,6 +59,12 @@ class Ui_InstantPrintDialog(object):
         self.label = QtGui.QLabel(InstantPrintDialog)
         self.label.setObjectName(_fromUtf8("label"))
         self.gridLayout.addWidget(self.label, 2, 0, 1, 1)
+        self.label_defaults = QtGui.QLabel(InstantPrintDialog)
+        self.label_defaults.setObjectName(_fromUtf8("label_defaults"))
+        self.gridLayout.addWidget(self.label_defaults, 1, 0, 1, 1)
+        self.comboBox_defaults = QtGui.QComboBox(InstantPrintDialog)
+        self.comboBox_defaults.setObjectName(_fromUtf8("comboBox_defaults"))
+        self.gridLayout.addWidget(self.comboBox_defaults, 1, 1, 1, 1)
 
         self.retranslateUi(InstantPrintDialog)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), InstantPrintDialog.accept)
@@ -70,4 +76,5 @@ class Ui_InstantPrintDialog(object):
         self.label_composers.setText(_translate("InstantPrintDialog", "Composer:", None))
         self.label_fileformat.setText(_translate("InstantPrintDialog", "File format:", None))
         self.label.setText(_translate("InstantPrintDialog", "Scale:", None))
+        self.label_defaults.setText(_translate("InstantPrintDialog", "Default paper format", None))
 
